@@ -7,7 +7,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-	<title>Experience Locator</title>
+	<title>Asset Map</title>
 	<meta name="description" content="">
 	<meta name="author" content="">
 
@@ -15,8 +15,10 @@
 
 	<link href="/app/css/base.css"        rel="stylesheet"  type="text/css" >
 	<link href="/app/css/style.css"       rel="stylesheet"  type="text/css" >
-  <link href="/app/css/leaflet.css"     rel="stylesheet"  type="text/css" />
-  <link href="/app/css/infobox.css"     rel="stylesheet"  type="text/css" />
+   <link href="/app/css/leaflet.css"     rel="stylesheet"  type="text/css" />
+   <link href="/app/css/infobox.css"     rel="stylesheet"  type="text/css" />
+   <link href="/app/js/libs/cartodb-gmapsv3/css/cartodb-gmapsv3.css" rel="stylesheet" type="text/css">
+   <link href="http://code.google.com/apis/maps/documentation/javascript/examples/default.css" rel="stylesheet" type="text/css" />   
   <!--[if lte IE 8]>
     <link href="/app/css/leaflet.ie.css"  rel="stylesheet"  type="text/css" />
   <![endif]-->
@@ -27,11 +29,11 @@
 
   <script id="index" type="text/html">
     <header>
-      <h2>Open Government Experience Locator</h2>
+      <h2>Small Business Assets Map</h2>
       <nav>
       	<ul>
           <li class="menu">
-            <a class="filter">Topics</a>
+            <a class="filter">Assets</a>
             <div class="filters topics">
               <img src="/app/img/menu_top.png" alt="" class="border_top" />
               <ul>
@@ -40,22 +42,22 @@
             </div>
           </li>
           <li class="menu">
-            <a class="filter">countries</a>
+            <a class="filter">Places</a>
             <div class="filters countries">
               <img src="/app/img/menu_top.png" alt="" class="border_top" />
               <ul></ul>
               <img src="/app/img/menu_bottom.png" alt="" class="border_bottom" />
             </div>
           </li>
-          <li class="menu">
-            <a class="filter">OGP challenges</a>
-            <div class="filters challenges">
-              <img src="/app/img/menu_top.png" alt="" class="border_top" />
-              <ul>
-              </ul>
-              <img src="/app/img/menu_bottom.png" alt="" class="border_bottom" />
-            </div>
-          </li>
+          <!-- <li class="menu"> -->
+          <!--   <a class="filter">OGP challenges</a> -->
+          <!--   <div class="filters challenges"> -->
+          <!--     <img src="/app/img/menu_top.png" alt="" class="border_top" /> -->
+          <!--     <ul> -->
+          <!--     </ul> -->
+          <!--     <img src="/app/img/menu_bottom.png" alt="" class="border_bottom" /> -->
+          <!--   </div> -->
+          <!-- </li> -->
       	</ul>
       </nav>
     </header>
@@ -69,11 +71,11 @@
         <div class="search container">
 
           <form action="">
-            <img src="/app/img/search_field_left.png" alt="" /><input class="search_box" type="text" value="" placeholder="Enter a search term..." /><img src="/app/img/search_field_right.png" alt="" />
+            <img src="/app/img/search_field_left.png" alt="" /><input class="search_box" type="text" value="" placeholder="Search for assets..." /><img src="/app/img/search_field_right.png" alt="" />
             <input class="mag_glass" type="submit" value="" />
           </form>
 
-          <div class="summary"></div>
+          <!-- <div class="summary"></div> -->
 
           <ul></ul>
 
@@ -84,19 +86,19 @@
       <div class="right">
 
         <div>
-          <h4>About the locator</h4>
-          <p>The Experience Locator features Open Government experiences from around the world, with special emphasis on presenting the insights from practitioners involved, links to implementing partners and related resources for further exploration.</p>
+          <h4>About this map</h4>
+          <p>An asset map for small business owners in the East Bay to find available resources.</p>
         </div>
-        <div>
-          <h4>How can you contribute?</h4>
-          <p>We are continuously enhancing our open government experiences database with cases distributed by any person. Can you help us?</p>
-          <a href="#">Recommend an experience</a>
-        </div>
-        <div class="last">
-          <h4>Download the data</h4>
-          <a href="http://ogp.cartodb.com/api/v1/sql/?q=SELECT%20title,%20ogp_countries.name%20as%20country,%20ogp_grandchallenges.name%20as%20ogp_grandchallenge,%20contact_information,%20website,%20subtitle,%20overview,%20background,%20video,%20implementation,%20critical_issues,%20category_id,%20implementing_partners,%20relevant_networks,%20resources_media,%20resources_document,%20resources_links,%20ogp_topics.name%20as%20topic%20FROM%20case_studies,%20ogp_topics,%20ogp_countries,%20ogp_grandchallenges%20where%20case_studies.topic_id%20=%20ogp_topics.cartodb_id%20and%20case_studies.country_id%20=%20ogp_countries.cartodb_id%20and%20case_studies.ogp_grandchallenges_id%20=%20ogp_grandchallenges.cartodb_id&format=csv">Download all Experiences data (CSV)</a></p>
-        </div>
-      </div>
+        <!-- <div> -->
+        <!--   <h4>How can you contribute?</h4> -->
+        <!--   <p>We are continuously enhancing our open government experiences database with cases distributed by any person. Can you help us?</p> -->
+        <!--   <a href="#">Recommend an experience</a> -->
+        <!-- </div> -->
+      <!--   <div class="last"> -->
+      <!--     <h4>Download the data</h4> -->
+      <!--     <a href="http://ogp.cartodb.com/api/v1/sql/?q=SELECT%20title,%20ogp_countries.name%20as%20country,%20ogp_grandchallenges.name%20as%20ogp_grandchallenge,%20contact_information,%20website,%20subtitle,%20overview,%20background,%20video,%20implementation,%20critical_issues,%20category_id,%20implementing_partners,%20relevant_networks,%20resources_media,%20resources_document,%20resources_links,%20ogp_topics.name%20as%20topic%20FROM%20case_studies,%20ogp_topics,%20ogp_countries,%20ogp_grandchallenges%20where%20case_studies.topic_id%20=%20ogp_topics.cartodb_id%20and%20case_studies.country_id%20=%20ogp_countries.cartodb_id%20and%20case_studies.ogp_grandchallenges_id%20=%20ogp_grandchallenges.cartodb_id&format=csv">Download all Experiences data (CSV)</a></p> -->
+      <!--   </div> -->
+      <!-- </div> -->
 
     </div>
 
@@ -326,6 +328,12 @@
 <script src="/app/js/libs/leaflet.js"             type="text/javascript"></script>
 <script src="/app/js/libs/TileLayer.MapsChart.js" type="text/javascript"></script>
 <script src="/app/js/libs/cartodb-leaflet.js"     type="text/javascript"></script>
+
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<script type="text/javascript" src="/app/js/libs/cartodb-gmapsv3/js/wax.g.min-6.2.0-touched.js"></script>
+<script type="text/javascript" src="/app/js/libs/cartodb-gmapsv3/dist/cartodb-gmapsv3-min.js"></script>
+<script type="text/javascript" src="/app/js/libs/cartodb-gmapsv3/dist/cartodb-infowindow-min.js"></script>
+
 <script src="/app/js/libs/ICanHaz.min.js"         type="text/javascript"></script>
 <script src="/app/js/libs/json2.js"               type="text/javascript"></script>
 <script src="/app/js/libs/backbone.cartodb.js"    type="text/javascript"></script>

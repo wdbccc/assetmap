@@ -25,7 +25,7 @@ window.IndexView = Backbone.View.extend({
   },
 
   render: function(){
-    document.title = 'Experience Locator';
+    document.title = 'Asset Map';
 
     this.$el.html(this.template);
 
