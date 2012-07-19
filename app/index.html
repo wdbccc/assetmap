@@ -1,0 +1,358 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<title>Experience Locator</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<meta name="viewport" content="width=device-width">
+
+	<link href="/app/css/base.css"        rel="stylesheet"  type="text/css" >
+	<link href="/app/css/style.css"       rel="stylesheet"  type="text/css" >
+  <link href="/app/css/leaflet.css"     rel="stylesheet"  type="text/css" />
+  <link href="/app/css/infobox.css"     rel="stylesheet"  type="text/css" />
+  <!--[if lte IE 8]>
+    <link href="/app/css/leaflet.ie.css"  rel="stylesheet"  type="text/css" />
+  <![endif]-->
+
+	<script src="js/libs/modernizr-2.5.3.js"></script>
+</head>
+<body>
+
+  <script id="index" type="text/html">
+    <header>
+      <h2>Open Government Experience Locator</h2>
+      <nav>
+      	<ul>
+          <li class="menu">
+            <a class="filter">Topics</a>
+            <div class="filters topics">
+              <img src="/app/img/menu_top.png" alt="" class="border_top" />
+              <ul>
+              </ul>
+              <img src="/app/img/menu_bottom.png" alt="" class="border_bottom" />
+            </div>
+          </li>
+          <li class="menu">
+            <a class="filter">countries</a>
+            <div class="filters countries">
+              <img src="/app/img/menu_top.png" alt="" class="border_top" />
+              <ul></ul>
+              <img src="/app/img/menu_bottom.png" alt="" class="border_bottom" />
+            </div>
+          </li>
+          <li class="menu">
+            <a class="filter">OGP challenges</a>
+            <div class="filters challenges">
+              <img src="/app/img/menu_top.png" alt="" class="border_top" />
+              <ul>
+              </ul>
+              <img src="/app/img/menu_bottom.png" alt="" class="border_bottom" />
+            </div>
+          </li>
+      	</ul>
+      </nav>
+    </header>
+
+    <div class="wrap"><div id="map"></div><a href="http://cartodb.com" id="cartodb_logo">CartoDB</a></div>
+
+    <div class="two_columns">
+
+      <div id="results" class="left">
+
+        <div class="search container">
+
+          <form action="">
+            <img src="/app/img/search_field_left.png" alt="" /><input class="search_box" type="text" value="" placeholder="Enter a search term..." /><img src="/app/img/search_field_right.png" alt="" />
+            <input class="mag_glass" type="submit" value="" />
+          </form>
+
+          <div class="summary"></div>
+
+          <ul></ul>
+
+        </div>
+
+      </div>
+
+      <div class="right">
+
+        <div>
+          <h4>About the locator</h4>
+          <p>The Experience Locator features Open Government experiences from around the world, with special emphasis on presenting the insights from practitioners involved, links to implementing partners and related resources for further exploration.</p>
+        </div>
+        <div>
+          <h4>How can you contribute?</h4>
+          <p>We are continuously enhancing our open government experiences database with cases distributed by any person. Can you help us?</p>
+          <a href="#">Recommend an experience</a>
+        </div>
+        <div class="last">
+          <h4>Download the data</h4>
+          <a href="http://ogp.cartodb.com/api/v1/sql/?q=SELECT%20title,%20ogp_countries.name%20as%20country,%20ogp_grandchallenges.name%20as%20ogp_grandchallenge,%20contact_information,%20website,%20subtitle,%20overview,%20background,%20video,%20implementation,%20critical_issues,%20category_id,%20implementing_partners,%20relevant_networks,%20resources_media,%20resources_document,%20resources_links,%20ogp_topics.name%20as%20topic%20FROM%20case_studies,%20ogp_topics,%20ogp_countries,%20ogp_grandchallenges%20where%20case_studies.topic_id%20=%20ogp_topics.cartodb_id%20and%20case_studies.country_id%20=%20ogp_countries.cartodb_id%20and%20case_studies.ogp_grandchallenges_id%20=%20ogp_grandchallenges.cartodb_id&format=csv">Download all Experiences data (CSV)</a></p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </script>
+
+  <script id="index_summary" type="text/html">
+    <div>
+      {{number_of_cases}} experiences <span class="for"></span><span class="in"></span><span class="clear">&nbsp;(<a>clear</a>)</span>
+    </div>
+  </script>
+
+  <script id="index_list_item" type="text/html">
+    <li>
+      <h3><a href="!detail/{{cartodb_id}}">{{title}}</a></h3>
+      <a href="!detail/{{cartodb_id}}" class="desc">{{subtitle}}</a>
+      {{#subtitle_country}}
+      <span>&middot;</span>
+      {{/subtitle_country}}
+      <a href="!detail/{{cartodb_id}}" class="where">{{topic}}} in {{country}}</a>
+      <p>{{{short_overview}}}</p>
+    </li>
+  </script>
+
+  <script id="filter_list_item" type="text/html">
+    <li><a href="{{url}}" class="{{type}}_{{cartodb_id}}">{{name}}</a></li>
+  </script>
+
+  <script id="detail" type="text/html">
+
+    <header>
+      <a id="back" href="/app/">Back to experience locator</a>
+    </header>
+
+    <div id="case_detail" class="two_columns">
+
+      <div class="left">
+
+        <div class="container">
+
+          <header>
+            <h1>{{title}}</h1>
+            <span>{{subtitle}}</span>
+          </header>
+
+          <div>
+            <h4>Overview</h4>
+            {{{overview_html}}}
+          </div>
+
+          <div>
+            <h4>Background</h4>
+            {{{background_html}}}
+          </div>
+
+          {{#video_player_url}}
+          <div>
+            <iframe src="{{video_player_url}}" frameborder="0"></iframe>
+          </div>
+          {{/video_player_url}}
+
+          <div>
+            <h4>Implementation</h4>
+            {{{implementation_html}}}
+          </div>
+
+          <div>
+            <h4>Critical issues & Achievements</h4>
+            {{{critical_issues_html}}}
+          </div>
+
+          <div id="disqus_thread"></div>
+          <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+        </div>
+
+        <div id="experiencies" class="container">
+          <h4>Related experiences</h4>
+          <ul></ul>
+        </div>
+
+      </div>
+
+      <div class="sidebar right">
+        <div id="mini_map">
+          <img src="https://chart.googleapis.com/chart?cht=map:auto=50,50,50,50&chs=298x348&chld={{country_iso}}&chco=D0EAF5%7CF4FCFF&chf=bg,s,B6DDEE" alt="" />
+          <p>{{country}}</p>
+        </div>
+
+        {{#topic}}
+        <div>
+          <h4>Topic</h4>
+          <span>{{topic}}</span>
+      	</div>
+        {{/topic}}
+
+        {{#implementing_partners_html}}
+      	<div>
+          <h4>Implementing partners</h4>
+          <p>{{{implementing_partners_html}}}</p>
+      	</div>
+        {{/implementing_partners_html}}
+
+        {{#website_html}}
+        <div>
+          <h4>Web Site</h4>
+          <p>{{{website_html}}}</p>
+        </div>
+        {{/website_html}}
+
+        {{#contact_information_html}}
+      	<div>
+          <h4>Contact Information</h4>
+          <p>{{{contact_information_html}}}</p>
+      	</div>
+        {{/contact_information_html}}
+
+        {{#relevant_networks_html}}
+      	<div>
+          <h4>Relevant Networks</h4>
+          <p>{{{relevant_networks_html}}}</p>
+      	</div>
+        {{/relevant_networks_html}}
+
+        {{#resources_media_html}}
+        <div>
+          <h4>Media</h4>
+          <p>{{{resources_media_html}}}</p>
+        </div>
+        {{/resources_media_html}}
+
+        {{#resources_document_html}}
+        <div>
+          <h4>Documents</h4>
+          <p>{{{resources_document_html}}}</p>
+        </div>
+        {{/resources_document_html}}
+
+        {{#resources_links_html}}
+        <div>
+          <h4>Links & Further reading</h4>
+          <p>{{{resources_links_html}}}</p>
+        </div>
+        {{/resources_links_html}}
+
+        <div>
+          <h4>Spread the word</h4>
+          <p><a href="#" class="tweet_button">Tweet it</a></p>
+          <p><a href="#" class="facebook_button">Share it on Facebook</a></p>
+        </div>
+
+      	<div class="last">
+          <ul>
+          	<li><a href="#">PDF version</a></li>
+            <li>
+              <div id="google_translate_element"></div>
+            </li>
+
+          </ul>
+      	</div>
+
+      </div>
+
+    </div>
+
+  </script>
+
+  <script>
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        autoDisplay: false,
+        layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL
+      }, 'google_translate_element');
+    }
+  </script>
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <script id="detail_related_item" type="text/html">
+    <li>
+      <h3><a href="!detail/{{cartodb_id}}">{{title}}</a></h3>
+      <span>{{subtitle}}</span>
+      {{#subtitle_country}}
+      <span>&middot;</span>
+      {{/subtitle_country}}
+      <span>Open Budget in {{country}}</span>
+    </li>
+  </script>
+
+  <script id="paragraph" type="text/html">
+    <div>
+      {{#paragraphs}}
+      <p>{{.}}</p>
+      {{/paragraphs}}
+    </div>
+  </script>
+
+  <script id="infobox" type="text/html">
+    <div class="box">
+      <div class="content">
+      <div class="header">
+      <hgroup>
+      <h3><a href="#!detail/{{cartodb_id}}">{{title}}</a></h3>
+      <p>{{topic}} &middot; {{country}}</p>
+      </hgroup>
+      </div>
+      </div>
+    </div>
+  </script>
+<!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
+
+	<div id="header">
+		<header class="wrapper clearfix"></header>
+	</div>
+
+	<div id="openbudget">
+	</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="/app/js/libs/jquery-1.7.1.min.js"><\/script>')</script>
+
+<script src="//documentcloud.github.com/underscore/underscore-min.js"></script>
+<script>window._ || document.write('<script src="/app/js/libs/underscore-min.js"><\/script>')</script>
+
+<script src="//documentcloud.github.com/backbone/backbone-min.js"></script>
+<script>window.Backbone || document.write('<script src="/app/js/libs/backbone-min.js"><\/script>')</script>
+
+<script src="/app/js/libs/leaflet.js"             type="text/javascript"></script>
+<script src="/app/js/libs/TileLayer.MapsChart.js" type="text/javascript"></script>
+<script src="/app/js/libs/cartodb-leaflet.js"     type="text/javascript"></script>
+<script src="/app/js/libs/ICanHaz.min.js"         type="text/javascript"></script>
+<script src="/app/js/libs/json2.js"               type="text/javascript"></script>
+<script src="/app/js/libs/backbone.cartodb.js"    type="text/javascript"></script>
+<script src="/app/js/libs/mercatorProjection.js"  type="text/javascript"></script>
+<script src="/app/js/libs/jquery.url.js"          type="text/javascript"></script>
+
+<script src="/app/js/backbone/cartodb.js"                  type="text/javascript"></script>
+<script src="/app/js/backbone/routers/main_router.js"      type="text/javascript"></script>
+<script src="/app/js/backbone/models/case_study.js"        type="text/javascript"></script>
+<script src="/app/js/backbone/collections/countries.js"    type="text/javascript"></script>
+<script src="/app/js/backbone/collections/categories.js"   type="text/javascript"></script>
+<script src="/app/js/backbone/collections/topics.js"       type="text/javascript"></script>
+<script src="/app/js/backbone/collections/challenges.js"   type="text/javascript"></script>
+<script src="/app/js/backbone/collections/case_studies.js" type="text/javascript"></script>
+<script src="/app/js/backbone/views/index.js"              type="text/javascript"></script>
+<script src="/app/js/backbone/views/detail.js"             type="text/javascript"></script>
+
+<script src="/app/js/map.js" type="text/javascript"></script>
+<script src="/app/js/script.js" type="text/javascript"></script>
+
+<script>
+	var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
+	(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+	g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+	s.parentNode.insertBefore(g,s)}(document,'script'));
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,34 @@
+application: wdb-ccc
+version: demo
+runtime: python27
+threadsafe: true
+api_version: 1
+
+handlers:
+
+- url: /app/js/
+  static_dir: app/js/
+
+- url: /app/js/libs/
+  static_dir: app/js/libs/
+
+- url: /app/js/backbone/
+  static_dir: app/js/backbone/
+
+- url: /app/js/backbone/routers/
+  static_dir: app/js/backbone/routers/
+
+- url: /app/js/backbone/views/
+  static_dir: app/js/backbone/views/
+
+- url: /app/js/backbone/collections/
+  static_dir: app/js/backbone/collections/
+
+- url: /app/css
+  static_dir: app/css
+
+- url: /app/img
+  static_dir: app/img
+
+- url: /
+  static_dir: app/
