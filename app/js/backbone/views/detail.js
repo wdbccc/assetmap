@@ -20,7 +20,7 @@ window.DetailView = Backbone.View.extend({
       return;
     }
 
-    document.title = 'Experience Locator - ' + Case.get('title');
+    document.title = 'Asset Map - ' + Case.get('title');
 
     this.template = ich.detail(Case.toJSON());
 
