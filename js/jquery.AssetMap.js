@@ -5,7 +5,7 @@
 
 //load scripts
 getScript("http://maps.googleapis.com/maps/api/js?sensor=false&libraries=drawing");
-getScript("http://code.jquery.com/ui/1.8.21/jquery-ui.min.js");
+getScript("js/jquery-ui-1.8.21.custom.min.js");
 
 //enable CSS
 jQuery.support.cors = true;
@@ -15,21 +15,24 @@ jQuery.support.cors = true;
 
         // Create some defaults, extending them with any options that were provided
         var settings = $.extend({
-            'mapCenterLng': 37.914868851081415,
-            'mapCenterLat': -122.0017056045532,
+            'mapCenterLat': 37.914868851081415,
+            'mapCenterLng': -122.0017056045532,
             'mapZoom': 10,
-            'testMode': true,
-			'filterButtons': [{ Title: "Green Business", Type: "Green Business", Icon: "ui-icon-locked" },
-				{ Title: "Free Consulting", Type: "Free Consulting", Icon: "ui-icon-alert" },
-				{ Title: "Financing", Type: "Financing", Icon: "ui-icon-circle-triangle-e" }]
+            'testMode': false,
+			'filterButtons': [{ Title: "Advice", Type: "Free Consulting", Icon: "ui-icon-advice", DefaultSelected: true },
+				{ Title: "Financing", Type: "Financing", Icon: "ui-icon-financing", DefaultSelected: true },
+				{ Title: "Networking", Type: "Networking", Icon: "ui-icon-networking", DefaultSelected: false },
+				{ Title: "Green Business", Type: "Green Business", Icon: "ui-icon-green", DefaultSelected: true },
+				{ Title: "Workforce", Type: "Workforce", Icon: "ui-icon-workforce", DefaultSelected: false }]
         }, options);
 
 		
-        var overlay, cartodb_imagemaptype, userMarker
+        var overlay, cartodb_imagemaptype, cartodb_imagemaptype2, userMarker
         alertContainer = null,
         mapContainer = null,
         resultContainer = null,
         buttonListContainer = null,
+		geoLocationContainer = null,
         carto_map = null,
         resultsDataList = null,
         markerImage = null,
@@ -77,14 +80,10 @@ jQuery.support.cors = true;
 
 		//create the category button list
         var createButtonList = function () {
-            //if geolocation is available add the button
-            if (navigator.geolocation)
-                $("<input type='button' value='get your location' />").appendTo(buttonListContainer).click(getUserLocation);
-            
             //option buttons
 			var filterButtons = settings['filterButtons'];
             for (buttonItem in filterButtons) {
-                buttonListContainer.append('<input type="checkbox" id="check' + buttonItem + '" primaryicon="' + filterButtons[buttonItem]["Icon"] + '" filtertype="' + filterButtons[buttonItem]["Type"] + '" filtername="' + filterButtons[buttonItem]["Title"] + '" /><label for="check' + buttonItem + '">' + filterButtons[buttonItem]["Title"] + '</label>');
+                buttonListContainer.append('<input type="checkbox" ' + (filterButtons[buttonItem]["DefaultSelected"] ? 'checked="Checked"' : "") + ' id="check' + buttonItem + '" primaryicon="' + filterButtons[buttonItem]["Icon"] + '" filtertype="' + filterButtons[buttonItem]["Type"] + '" filtername="' + filterButtons[buttonItem]["Title"] + '" /><label for="check' + buttonItem + '">' + filterButtons[buttonItem]["Title"] + '</label>');
             }
 
             $(function () {
@@ -125,7 +124,7 @@ jQuery.support.cors = true;
                                 headingContainer.append("<h2>" + filtername + "</h2>");
                             }
 							groupHeight += 1;
-                            var resourceItem = $("<div class='resourceItem'><h3>" + val["name"] + "</h3><a href='" + cleanURLLink(val["url"]) + "'>" + cleanURLView(val["url"]) + "</a></div>").appendTo(headingContainer);
+                            var resourceItem = $("<div class='resourceItem'><h3>" + val["name"] + "</h3><a href='" + cleanURLLink(val["url"]) + "'><strong>website:</strong>" + cleanURLView(val["url"]) + "</a></br>short description about the resource here</div>").appendTo(headingContainer);
 							resourceItem.children("a").click(function(){recordOutboundLink(this,'Resource',val["type"] + " - " + val["name"]); return false;});
 						}
                     })
@@ -161,8 +160,7 @@ jQuery.support.cors = true;
 				//put items into each column
 				for (j=0; j<headingContainerArr.length; j++)
 				{
-					if(rowCount > j)
-					{
+					if(rowCount >= j){
     					headingContainerArr[j][0].appendTo(rowOne);
 					} else {
     					headingContainerArr[j][0].appendTo(rowTwo);
@@ -241,15 +239,83 @@ jQuery.support.cors = true;
 			}
 		}
 		
+		
+		var HomeControl = function(controlDiv, map) {
+			// Set CSS styles for the DIV containing the control
+			// Setting padding to 5 px will offset the control
+			// from the edge of the map.
+			controlDiv.style.padding = '5px';
+			
+			// Set CSS for the control border.
+			var controlUI = document.createElement('div');
+			controlUI.style.backgroundColor = 'white';
+			controlUI.style.borderStyle = 'solid';
+			controlUI.style.borderWidth = '1px';
+			controlUI.style.cursor = 'pointer';
+			controlUI.style.textAlign = 'center';
+			controlUI.title = 'Click to set the map to Home';
+			controlDiv.appendChild(controlUI);
+			
+			// Set CSS for the control interior.
+			var controlText = document.createElement('div');
+			controlText.style.fontFamily = 'Arial,sans-serif';
+			controlText.style.fontSize = '12px';
+			controlText.style.paddingLeft = '4px';
+			controlText.style.paddingRight = '4px';
+			controlText.innerHTML = '<strong>Home<strong>';
+			controlUI.appendChild(controlText);
+			
+			var homeLocation = new google.maps.LatLng(settings['mapCenterLat'], settings['mapCenterLng']);
+	
+			// Setup the click event listeners: simply set the map to Chicago.
+			google.maps.event.addDomListener(controlUI, 'click', function() {
+				map.setCenter(homeLocation)
+			});
+		}
+		
+		var geoLocationControl = function(controlDiv) {
+			// Set CSS styles for the DIV containing the control
+			// Setting padding to 5 px will offset the control
+			// from the edge of the map.
+			controlDiv.style.padding = '5px';
+			
+			// Set CSS for the control border.
+			var controlUI = document.createElement('div');
+			controlUI.style.backgroundColor = 'white';
+			controlUI.style.borderStyle = 'solid';
+			controlUI.style.borderWidth = '1px';
+			controlUI.style.cursor = 'pointer';
+			controlUI.style.textAlign = 'center';
+			controlUI.title = 'Click to locate your current position';
+			controlDiv.appendChild(controlUI);
+			
+			// Set CSS for the control interior.
+			var controlText = document.createElement('div');
+			controlText.style.fontFamily = 'Arial,sans-serif';
+			controlText.style.fontSize = '12px';
+			controlText.style.paddingLeft = '4px';
+			controlText.style.paddingRight = '4px';
+			controlText.innerHTML = '<strong>Your Location<strong>';
+			controlUI.appendChild(controlText);
+
+			// Setup the click event listeners: simply set the map to Chicago.
+			google.maps.event.addDomListener(controlUI, 'click', getUserLocation);
+		}
+		
+		
+		
 		//*************
 		//set up the control
 		//**************
 		
-		this.append("<div id='map'></div><div id='data'><div id='alerts'></div><div id='buttonList'></div><div id='results'></div></div>");
+		this.append("<div id='map'></div><div id='geoLocation'></div>" +
+			"<div class='intro'>Select general location on map above to find business resources in your area. You can filter the resources by turning on and off the following categories.</div>" +
+			"<div id='data'><div id='alerts'></div><div id='categoryList'><div class='categoryLabel'>Categories:</div><div class='buttonList'></div></div><div id='results'>Click your location on the map to get started</div></div>");
 		mapContainer = $("#map", this);
+		geoLocationContainer = $("#geoLocation", this);
 		alertContainer = $("#data #alerts", this);
 		resultContainer = $("#data #results", this);
-		buttonListContainer = $("#data #buttonList", this);
+		buttonListContainer = $("#data #categoryList .buttonList", this);
 		
 		
 		markerImage = new google.maps.MarkerImage('http://cartodb-gallery.appspot.com/static/icon.png');
@@ -263,11 +329,23 @@ jQuery.support.cors = true;
 			tileSize: new google.maps.Size(256, 256)
 		};
 		
+		cartodb_layer2 = {
+			getTileUrl: function (coord, zoom) {
+				return "https://wdbassetmap.cartodb.com/tiles/citylimits_cc/" + zoom + "/" + coord.x + "/" + coord.y + ".png";
+			},
+			tileSize: new google.maps.Size(256, 256)
+		};
+		
 		//map options
 		var cartodbMapOptions = {
 			zoom: settings['mapZoom'],
-			center: new google.maps.LatLng(settings['mapCenterLng'], settings['mapCenterLat']),
+			center: new google.maps.LatLng(settings['mapCenterLat'], settings['mapCenterLng']),
 			disableDefaultUI: true,
+			zoomControl: true,
+				zoomControlOptions: {
+				style: google.maps.ZoomControlStyle.SMALL,
+				position: google.maps.ControlPosition.TOP_RIGHT
+			},
 			mapTypeId: google.maps.MapTypeId.ROADMAP
 		}
 	
@@ -278,7 +356,7 @@ jQuery.support.cors = true;
 			{ featureType: "administrative", stylers: [{ saturation: -95 }, 
 			{ gamma: 2.26 }] }, 
 			{ featureType: "water", elementType: "labels", stylers: [{ visibility: "off" }] }, 
-			{ featureType: "administrative.locality", stylers: [{ visibility: 'off' }] }, 
+			{ featureType: "administrative.locality", stylers: [{ visibility: 'on' }] }, 
 			{ featureType: "road", stylers: [{ visibility: "simplified" }, { saturation: -99 }, { gamma: 2.22 }] }, 
 			{ featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] }, 
 			{ featureType: "road.arterial", stylers: [{ visibility: 'off' }] }, 
@@ -306,12 +384,33 @@ jQuery.support.cors = true;
 					'<br />BOUNDS: SW LAT: ' + boundsSouthWest.lat() + ', LNG ' + boundsSouthWest.lng() + ' - NE LAT: ' + boundsNorthEast.lat() + ', LNG ' + boundsNorthEast.lng());
 			});
 		}
-	
+		
+		 //if geolocation is available add the button
+		if (navigator.geolocation)
+		{
+			var getUserLocationDiv = document.createElement('div');
+			var getUserLocationControl = new geoLocationControl(getUserLocationDiv);
+			
+			getUserLocationDiv.index = 1;
+			carto_map.controls[google.maps.ControlPosition.TOP_RIGHT].push(getUserLocationDiv);
+		}
+		
+		//create map home button
+		var homeControlDiv = document.createElement('div');
+		var homeControl = new HomeControl(homeControlDiv, carto_map);
+		homeControlDiv.index = 1;
+		carto_map.controls[google.maps.ControlPosition.TOP_RIGHT].push(homeControlDiv);
+		
+		
 		// Add the cartodb tiles
 		cartodb_imagemaptype = new google.maps.ImageMapType(cartodb_layer);
 		carto_map.overlayMapTypes.insertAt(0, cartodb_imagemaptype);
+		
+		cartodb_imagemaptype2 = new google.maps.ImageMapType(cartodb_layer2);
+		carto_map.overlayMapTypes.insertAt(1, cartodb_imagemaptype2);
 	
 		createButtonList();
         return this;
     };
+	
 })(jQuery);
